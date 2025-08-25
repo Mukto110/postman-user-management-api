@@ -1,0 +1,753 @@
+{
+	"info": {
+		"_postman_id": "11c6cce1-1abb-42ed-80c5-44e21594ae45",
+		"name": "02_Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27409369"
+	},
+	"item": [
+		{
+			"name": "POST_Register_User",
+			"item": [
+				{
+					"name": "Successful_Registration",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const validUsers = [",
+									"    { email: \"eve.holt@reqres.in\", password: \"cityslicka\" },",
+									"    { email: \"janet.weaver@reqres.in\", password: \"pistol\" },",
+									"    { email: \"george.bluth@reqres.in\", password: \"supersecret\" }",
+									"];",
+									"",
+									"const randomUser = validUsers[Math.floor(Math.random() * validUsers.length)];",
+									"",
+									"pm.globals.set(\"user_email\", randomUser.email);",
+									"pm.globals.set(\"user_password\", randomUser.password);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"",
+									"const registrationSuccessSchema = {",
+									"    \"type\": \"object\",",
+									"    \"required\": [\"id\", \"token\"],",
+									"    \"properties\": {",
+									"        \"id\": {",
+									"            \"type\": \"number\",",
+									"            \"minimum\": 1",
+									"        },",
+									"        \"token\": {",
+									"            \"type\": \"string\",",
+									"            \"minLength\": 10,",
+									"            \"pattern\": \"^[a-zA-Z0-9]+$\"",
+									"        }",
+									"    }",
+									"};",
+									"",
+									"pm.test(\"Registration successful - Status 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(`Registration response time ${expectedResponseTime}`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Registration response contains required fields\", function () {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('token');",
+									"});",
+									"",
+									"pm.test(\"Registration ID is numeric\", function () {",
+									"    pm.expect(jsonData.id).to.be.a('number');",
+									"    pm.expect(jsonData.id).to.be.above(0);",
+									"    pm.collectionVariables.set(\"registration_id\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"Registration token format validation\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.token).to.be.a('string');",
+									"    pm.expect(response.token.length).to.be.above(0);",
+									"    ",
+									"    pm.expect(response.token).to.match(/^[a-zA-Z0-9]+$/);",
+									"    ",
+									"    pm.environment.set(\"auth_token\", response.token);",
+									"});",
+									"",
+									"pm.test(\"Token has reasonable length\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.token.length).to.be.within(10, 500);",
+									"});",
+									"",
+									"pm.test(\"Response Content-Type is JSON\", function () {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Registration response schema validation\", function() {",
+									"    pm.response.to.have.jsonSchema(registrationSuccessSchema);",
+									"});",
+									"",
+									"pm.test(\"Token security characteristics\", function () {",
+									"    const response = pm.response.json();",
+									"    ",
+									"    if (response.token) {",
+									"        const token = response.token;",
+									"        ",
+									"        pm.expect(token).to.not.equal(\"123456\");",
+									"        pm.expect(token).to.not.equal(\"password\");",
+									"        pm.expect(token).to.not.equal(\"token\");",
+									"        ",
+									"        const uniqueChars = new Set(token.split('')).size;",
+									"        pm.expect(uniqueChars).to.be.above(5);",
+									"        ",
+									"        pm.globals.set(\"current_token\", token);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_email}}\",\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Email_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Missing email returns 400 error\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Missing email error message validation\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Missing email or username');",
+									"});",
+									"",
+									"pm.test(\"No token provided when email missing\", function () {",
+									"    pm.expect(jsonData).to.not.have.property('token');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"{{user_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Password_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Missing password returns 400 error\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Missing password error message validation\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Missing password');",
+									"});",
+									"",
+									"pm.test(\"No token provided when password missing\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.not.have.property('token');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_email}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid_Email_Format_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Invalid email format returns 400 error\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Invalid email error handling\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Note: Only defined users succeed registration');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"invalid-email-format\",\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unsupported_Email_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Unsupported email returns 400 error\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Unsupported email error message\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Note: Only defined users succeed registration');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST_Login_User",
+			"item": [
+				{
+					"name": "Successful_Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"",
+									"const loginSuccessSchema = {",
+									"    \"type\": \"object\",",
+									"    \"required\": [\"token\"],",
+									"    \"properties\": {",
+									"        \"token\": {",
+									"            \"type\": \"string\",",
+									"            \"minLength\": 10,",
+									"            \"pattern\": \"^[a-zA-Z0-9]+$\"",
+									"        }",
+									"    }",
+									"};",
+									"",
+									"pm.test(\"Login successful - Status 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Login response contains token\", function () {",
+									"    pm.expect(jsonData).to.have.property('token');",
+									"});",
+									"",
+									"pm.test(\"Login token format validation\", function () {",
+									"    pm.expect(jsonData.token).to.be.a('string');",
+									"    pm.expect(jsonData.token.length).to.be.above(0);",
+									"    ",
+									"    pm.environment.set(\"login_token\", jsonData.token);",
+									"});",
+									"",
+									"pm.test(\"Login token is alphanumeric\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.token).to.match(/^[a-zA-Z0-9]+$/);",
+									"});",
+									"",
+									"pm.test(\"Login token consistency check\", function () {",
+									"    const authToken = pm.environment.get(\"auth_token\");",
+									"    ",
+									"    if (authToken) {",
+									"        pm.expect(jsonData.token.length).to.equal(authToken.length);",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Security headers present\", function () {",
+									"    const headers = pm.response.headers;",
+									"    ",
+									"    pm.expect(headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Login response schema validation\", function() {",
+									"    pm.response.to.have.jsonSchema(loginSuccessSchema);",
+									"});",
+									"",
+									"pm.test(\"Token security characteristics\", function () {",
+									"    const response = pm.response.json();",
+									"    ",
+									"    if (response.token) {",
+									"        const token = response.token;",
+									"        ",
+									"        pm.expect(token).to.not.equal(\"123456\");",
+									"        pm.expect(token).to.not.equal(\"password\");",
+									"        pm.expect(token).to.not.equal(\"token\");",
+									"        ",
+									"        const uniqueChars = new Set(token.split('')).size;",
+									"        pm.expect(uniqueChars).to.be.above(5);",
+									"        ",
+									"        pm.globals.set(\"current_token\", token);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_email}}\",\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Email_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Login without email returns 400\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Login missing email error message\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Missing email or username');",
+									"});",
+									"",
+									"pm.test(\"No token on failed login\", function () {",
+									"    pm.expect(jsonData).to.not.have.property('token');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Password_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Login without password returns 400\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Login missing password error message\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('Missing password');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{user_email}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid_Email_Format_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Login with invalid email format returns 400\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Invalid email login error validation\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"    pm.expect(jsonData.error).to.include('user not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"invalid-email\",\n    \"password\": \"{{user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Wrong_Credentials_Negative",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"wrong_email\", \"wrong@example.com\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Wrong credentials return 400\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Wrong credentials error message\", function () {",
+									"    pm.expect(jsonData).to.have.property('error');",
+									"     pm.expect(jsonData.error).to.include('user not found');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{wrong_email}}\",\n    \"password\": \"wrongpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{API_Key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-api-key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "response_time",
+			"value": "2000"
+		},
+		{
+			"key": "registration_id",
+			"value": ""
+		}
+	]
+}

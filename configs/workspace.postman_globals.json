@@ -1,0 +1,45 @@
+{
+	"id": "d948b3d6-cb12-4b25-8812-88ebee7270c8",
+	"values": [
+		{
+			"key": "updated_name",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "updated_job",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "user_password",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "wrong_email",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "current_token",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2025-08-25T13:29:40.763Z",
+	"_postman_exported_using": "Postman/11.60.0"
+}

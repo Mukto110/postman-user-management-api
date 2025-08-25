@@ -1,0 +1,1665 @@
+{
+	"info": {
+		"_postman_id": "17bada78-b433-40d7-9d52-60287b36953b",
+		"name": "01_User_Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27409369"
+	},
+	"item": [
+		{
+			"name": "GET_List_Users",
+			"item": [
+				{
+					"name": "1_Default_Pagination",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"",
+									"const firstUserId = jsonData.data[0].id;",
+									"pm.collectionVariables.set(\"valid_user_id\", firstUserId);",
+									"",
+									"const schema = {",
+									"    \"type\": \"object\",",
+									"    \"properties\": {",
+									"        \"page\": {",
+									"            \"type\": \"integer\"",
+									"        },",
+									"        \"per_page\": {",
+									"            \"type\": \"integer\"",
+									"        },",
+									"        \"total\": {",
+									"            \"type\": \"integer\"",
+									"        },",
+									"        \"total_pages\": {",
+									"            \"type\": \"integer\"",
+									"        },",
+									"        \"data\": {",
+									"            \"type\": \"array\",",
+									"            \"items\": {",
+									"                \"type\": \"object\",",
+									"                \"properties\": {",
+									"                    \"id\": { \"type\": \"integer\" },",
+									"                    \"email\": { \"type\": \"string\" },",
+									"                    \"first_name\": { \"type\": \"string\" },",
+									"                    \"last_name\": { \"type\": \"string\" },",
+									"                    \"avatar\": { \"type\": \"string\" }",
+									"                },",
+									"                \"required\": [\"id\", \"email\", \"first_name\", \"last_name\", \"avatar\"]",
+									"            }",
+									"        },",
+									"        \"support\": {",
+									"            \"type\": \"object\",",
+									"            \"properties\": {",
+									"                \"url\": {",
+									"                    \"type\": \"string\"",
+									"                },",
+									"                \"text\": {",
+									"                    \"type\": \"string\"",
+									"                }",
+									"            },",
+									"            \"required\": [",
+									"                \"url\",",
+									"                \"text\"",
+									"            ]",
+									"        }",
+									"    },",
+									"    \"required\": [",
+									"        \"page\",",
+									"        \"per_page\",",
+									"        \"total\",",
+									"        \"total_pages\",",
+									"        \"data\",",
+									"        \"support\"",
+									"    ]",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('page');",
+									"    pm.expect(response).to.have.property('per_page');",
+									"    pm.expect(response).to.have.property('total');",
+									"    pm.expect(response).to.have.property('total_pages');",
+									"    pm.expect(response).to.have.property('data');",
+									"    pm.expect(response.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Default pagination returns page 1\", () => {",
+									"    pm.expect(jsonData.page).to.equal(1);",
+									"})",
+									"",
+									"pm.test(\"Default pagination returns per_page 6\", () => {",
+									"    pm.expect(jsonData.per_page).to.equal(6);",
+									"});",
+									"",
+									"pm.test(\"Default pagination returns total 12\", () => {",
+									"    pm.expect(jsonData.total).to.equal(12);",
+									"});",
+									"",
+									"pm.test(\"Response body is a valid json\", () => {",
+									"    pm.response.to.have.jsonSchema(schema);",
+									"})",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json (strict)\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response is an object and not empty\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\").not.to.be.empty;",
+									"})",
+									"",
+									"pm.test(\"Length of the returned users data is 6\", () => {",
+									"    pm.expect(jsonData.data.length).to.eql(6);",
+									"})",
+									"",
+									"pm.test(\"User's IDs are unique\", () => {",
+									"    const ids = jsonData.data.map(p => p.id);",
+									"    const uniqueIds = [...new Set(ids)];",
+									"    pm.expect(ids.length).to.eql(uniqueIds.length);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2_Page_1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"",
+									"const schema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"page\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"per_page\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"total\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"total_pages\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"data\": {",
+									"      \"type\": \"array\",",
+									"      \"items\": [",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        }",
+									"      ]",
+									"    },",
+									"    \"support\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"url\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"text\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"url\",",
+									"        \"text\"",
+									"      ]",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"page\",",
+									"    \"per_page\",",
+									"    \"total\",",
+									"    \"total_pages\",",
+									"    \"data\",",
+									"    \"support\"",
+									"  ]",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('page');",
+									"    pm.expect(response).to.have.property('per_page');",
+									"    pm.expect(response).to.have.property('total');",
+									"    pm.expect(response).to.have.property('total_pages');",
+									"    pm.expect(response).to.have.property('data');",
+									"    pm.expect(response.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Page 1 parameter matches response\", function () {",
+									"    pm.expect(jsonData.page).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Pagination returns per_page 6\", () => {",
+									"    pm.expect(jsonData.per_page).to.equal(6);",
+									"});",
+									"",
+									"pm.test(\"Pagination returns total 12\", () => {",
+									"    pm.expect(jsonData.total).to.equal(12);",
+									"});",
+									"",
+									"pm.test(\"Response body is a valid json\", () => {",
+									"    pm.response.to.have.jsonSchema(schema);",
+									"})",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json (strict)\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response is an object and not empty\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\").not.to.be.empty;",
+									"})",
+									"",
+									"pm.test(\"Length of the returned users data is 6\", () => {",
+									"    pm.expect(jsonData.data.length).to.eql(6);",
+									"})",
+									"",
+									"pm.test(\"User's IDs are unique\", () => {",
+									"    const ids = jsonData.data.map(p => p.id);",
+									"    const uniqueIds = [...new Set(ids)];",
+									"    pm.expect(ids.length).to.eql(uniqueIds.length);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"page_number\", 1);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users?page={{page_number}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{page_number}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3_Page_2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"page_number\", 2);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"",
+									"const schema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"page\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"per_page\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"total\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"total_pages\": {",
+									"      \"type\": \"integer\"",
+									"    },",
+									"    \"data\": {",
+									"      \"type\": \"array\",",
+									"      \"items\": [",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        },",
+									"        {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"id\": {",
+									"              \"type\": \"integer\"",
+									"            },",
+									"            \"email\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"first_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"last_name\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"avatar\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [",
+									"            \"id\",",
+									"            \"email\",",
+									"            \"first_name\",",
+									"            \"last_name\",",
+									"            \"avatar\"",
+									"          ]",
+									"        }",
+									"      ]",
+									"    },",
+									"    \"support\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"url\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"text\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"url\",",
+									"        \"text\"",
+									"      ]",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"page\",",
+									"    \"per_page\",",
+									"    \"total\",",
+									"    \"total_pages\",",
+									"    \"data\",",
+									"    \"support\"",
+									"  ]",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('page');",
+									"    pm.expect(response).to.have.property('per_page');",
+									"    pm.expect(response).to.have.property('total');",
+									"    pm.expect(response).to.have.property('total_pages');",
+									"    pm.expect(response).to.have.property('data');",
+									"    pm.expect(response.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Page 2 parameter matches response\", function () {",
+									"    pm.expect(jsonData.page).to.equal(2);",
+									"});",
+									"",
+									"pm.test(\"Pagination returns per_page 6\", () => {",
+									"    pm.expect(jsonData.per_page).to.equal(6);",
+									"});",
+									"",
+									"pm.test(\"Pagination returns total 12\", () => {",
+									"    pm.expect(jsonData.total).to.equal(12);",
+									"});",
+									"",
+									"pm.test(\"Response body is a valid json\", () => {",
+									"    pm.response.to.have.jsonSchema(schema);",
+									"})",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json (strict)\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/json; charset=utf-8\");",
+									"});",
+									"",
+									"pm.test(\"Response is an object and not empty\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\").not.to.be.empty;",
+									"})",
+									"",
+									"pm.test(\"Length of the returned users data is 6\", () => {",
+									"    pm.expect(jsonData.data.length).to.eql(6);",
+									"})",
+									"",
+									"pm.test(\"User's IDs are unique\", () => {",
+									"    const ids = jsonData.data.map(p => p.id);",
+									"    const uniqueIds = [...new Set(ids)];",
+									"    pm.expect(ids.length).to.eql(uniqueIds.length);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users?page={{page_number}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{page_number}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4_Beyond_Last_Page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const invalidPageNo = pm.collectionVariables.get(\"invalid_page_number\");",
+									"",
+									"pm.test(\"Status code is 200 or 400\", () => {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+									"})",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Response page number matches to the request page number\", () => {",
+									"    pm.expect(jsonData.page).to.equal(parseInt(invalidPageNo));",
+									"});",
+									"",
+									"pm.test(\"Response returns no data\", () => {",
+									"    pm.expect(jsonData.data.length).to.equal(0);",
+									"    pm.expect(jsonData.data).to.be.an(\"array\").empty;",
+									"});",
+									"",
+									"pm.test(\"Response has all expected keys\", () => {",
+									"    pm.expect(jsonData).to.have.all.keys(\"page\", \"per_page\", \"total\", \"total_pages\", \"data\", \"support\");",
+									"});",
+									"",
+									"pm.test(\"Pagination fields are numbers\", () => {",
+									"    pm.expect(jsonData.per_page).to.be.a(\"number\");",
+									"    pm.expect(jsonData.total).to.be.a(\"number\");",
+									"    pm.expect(jsonData.total_pages).to.be.a(\"number\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users?page={{invalid_page_number}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "{{invalid_page_number}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GET_Single_User",
+			"item": [
+				{
+					"name": "Valid_User_ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const userData = jsonData.data;",
+									"const expectedId = pm.collectionVariables.get(\"valid_user_id\");",
+									"",
+									"const schema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"data\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"id\": {",
+									"          \"type\": \"integer\"",
+									"        },",
+									"        \"email\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"first_name\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"last_name\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"avatar\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"id\",",
+									"        \"email\",",
+									"        \"first_name\",",
+									"        \"last_name\",",
+									"        \"avatar\"",
+									"      ]",
+									"    },",
+									"    \"support\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"url\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"text\": {",
+									"          \"type\": \"string\"",
+									"        }",
+									"      },",
+									"      \"required\": [",
+									"        \"url\",",
+									"        \"text\"",
+									"      ]",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"data\",",
+									"    \"support\"",
+									"  ]",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Response body is valid JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Response body matches schema\", function () {",
+									"    pm.expect(jsonData).to.be.jsonSchema(schema);",
+									"});",
+									"",
+									"pm.test(\"Data id matches expected id\", function () {",
+									"    pm.expect(userData.id).to.equal(parseInt(expectedId));",
+									"});",
+									"",
+									"pm.test(\"Response contains user data and support info\", function () {",
+									"    pm.expect(jsonData).to.have.property('data');",
+									"    pm.expect(jsonData).to.have.property('support');",
+									"    ",
+									"    pm.expect(userData).to.have.property('id');",
+									"    pm.expect(userData).to.have.property('email');",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Email is valid format\", () => {",
+									"    pm.expect(userData.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"First and last names are non-empty\", () => {",
+									"    pm.expect(userData.first_name).to.be.a(\"string\").and.not.empty;",
+									"    pm.expect(userData.last_name).to.be.a(\"string\").and.not.empty;",
+									"});",
+									"",
+									"pm.test(\"No unexpected fields in user data\", () => {",
+									"    const allowedKeys = [\"id\", \"email\", \"first_name\", \"last_name\", \"avatar\"];",
+									"    pm.expect(Object.keys(userData)).to.have.members(allowedKeys);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{valid_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{valid_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Non_Existent_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Non-existent user returns 404\", function () {",
+									"    pm.expect(pm.response.code).to.equal(404);",
+									"});",
+									"",
+									"pm.test(\"404 response has empty body\", function () {",
+									"    pm.expect(pm.response.text()).to.equal('{}');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid_User_ID_Format",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Invalid user ID format returns 404\", function () {",
+									"    pm.expect(pm.response.code).to.equal(404);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/abc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"abc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST_Create_User",
+			"item": [
+				{
+					"name": "Valid_User_Creation",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"random_name\", \"TestUser_\" + Math.floor(Math.random() * 10000));",
+									"pm.environment.set(\"random_job\", \"Tester_\" + Date.now());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const expectedName = pm.environment.get(\"random_name\");",
+									"const expectedJob = pm.environment.get(\"random_job\");",
+									"",
+									"pm.environment.set(\"current_user_id\", jsonData.id);",
+									"",
+									"const schema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"name\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"job\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"id\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"createdAt\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"name\",",
+									"    \"job\",",
+									"    \"id\",",
+									"    \"createdAt\"",
+									"  ]",
+									"}",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Response contains required fields\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('name');",
+									"    pm.expect(response).to.have.property('job');",
+									"    pm.expect(response).to.have.property('createdAt');",
+									"});",
+									"",
+									"pm.test(\"Name and Job match the request\", function () {",
+									"    pm.expect(jsonData.name).to.equal(expectedName);",
+									"    pm.expect(jsonData.job).to.equal(expectedJob);",
+									"});",
+									"",
+									"pm.test(\"ID is numeric\", function () {",
+									"    pm.expect(jsonData.id).to.match(/^\\d+$/);",
+									"});",
+									"",
+									"pm.test(\"CreatedAt timestamp is valid ISO format\", function () {",
+									"    const timestamp = new Date(jsonData.createdAt);",
+									"    pm.expect(timestamp).to.be.a('date');",
+									"    pm.expect(jsonData.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Response body is not empty\", () => {",
+									"    pm.expect(pm.response.text()).to.not.be.empty;",
+									"});",
+									"",
+									"pm.test(\"Response body is valid JSON\", () => {",
+									"    try {",
+									"        JSON.parse(pm.response.text());",
+									"    } catch (e) {",
+									"        pm.expect.fail(\"Response body is not valid JSON\");",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Response body matches schema\", () => {",
+									"    pm.response.to.have.jsonSchema(schema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{random_name}}\",\n    \"job\": \"{{random_job}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Empty_Body_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"",
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Empty body still creates user with default values\", function () {",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('createdAt');",
+									"});",
+									"",
+									"pm.test(\"ID is numeric\", function () {",
+									"    pm.expect(jsonData.id).to.match(/^\\d+$/);",
+									"});",
+									"",
+									"pm.test(\"CreatedAt timestamp is valid ISO format\", function () {",
+									"    const timestamp = new Date(jsonData.createdAt);",
+									"    pm.expect(timestamp).to.be.a('date');",
+									"    pm.expect(jsonData.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(\"Response body is not empty\", () => {",
+									"    pm.expect(pm.response.text()).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Fields_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Partial data handled appropriately\", function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    pm.expect(jsonData.name).to.equal(\"TestOnly\");",
+									"    pm.expect(jsonData).to.not.have.property('job');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"TestOnly\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PUT_Update_User",
+			"item": [
+				{
+					"name": "Full_Update",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"updated_name\", \"UpdatedUser_\" + Date.now());",
+									"pm.globals.set(\"updated_job\", \"UpdatedJob_\" + Date.now());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"",
+									"const oldName = pm.environment.get(\"random_name\");",
+									"const oldJob = pm.environment.get(\"random_job\");",
+									"const currentName = pm.globals.get(\"updated_name\");",
+									"const currentJob = pm.globals.get(\"updated_job\");",
+									"",
+									"pm.test(\"User updated successfully\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Name and job are updated correctly\", function () {",
+									"    pm.expect(currentName).not.to.equal(oldName);",
+									"    pm.expect(currentJob).not.to.equal(oldJob);",
+									"});",
+									"",
+									"pm.test(\"UpdatedAt timestamp is recent\", function () {",
+									"    const response = pm.response.json();",
+									"    const updatedTime = new Date(response.updatedAt);",
+									"    const now = new Date();",
+									"    const timeDiff = now - updatedTime;",
+									"    ",
+									"    pm.expect(timeDiff).to.be.below(60000); ",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{updated_name}}\",\n    \"job\": \"{{updated_job}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users/{{current_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"{{current_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Non-existent User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update non-existent user still returns 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"job\": \"Test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DELETE_User",
+			"item": [
+				{
+					"name": "Valid_Deletion",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"",
+									"pm.test(\"User deleted successfully\", function () {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"});",
+									"",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", function () {",
+									"    pm.response.to.have.status(\"No Content\");",
+									"});",
+									"",
+									"pm.test(\"Delete returns no content\", function () {",
+									"    pm.expect(pm.response.text()).to.equal(\"\");",
+									"});",
+									"",
+									"pm.test(\"Response time is acceptable\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users/{{current_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"{{current_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Non_Existent_User_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Delete non-existent user returns 204\", function () {",
+									"    pm.expect(pm.response.code).to.equal(204);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/{{api_version}}/users/999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "in",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{API_Key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "x-api-key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "page_number",
+			"value": "1"
+		},
+		{
+			"key": "invalid_page_number",
+			"value": "999"
+		},
+		{
+			"key": "valid_user_id",
+			"value": ""
+		},
+		{
+			"key": "response_time",
+			"value": "1000"
+		}
+	]
+}
