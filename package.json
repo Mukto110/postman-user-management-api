@@ -1,0 +1,14 @@
+{
+  "name": "user-management-api-testing",
+  "version": "1.0.0",
+  "description": "Automated API testing with CI/CD",
+  "scripts": {
+    "test:user-management": "newman run collections/01_User_Management.postman_collection.json -e configs/qa_postman_environment.json -g configs/workspace.postman_globals.json --reporters cli,htmlextra,junit --reporter-htmlextra-export reports/user-management-report.html --reporter-junit-export reports/user-management-results.xml",
+    "test:authentication": "newman run collections/02_Authentication.postman_collection.json -e configs/qa_postman_environment.json -g configs/workspace.postman_globals.json --reporters cli,htmlextra,junit --reporter-htmlextra-export reports/authentication-report.html --reporter-junit-export reports/authentication-results.xml",
+    "test:all": "npm run test:user-management && npm run test:authentication"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}

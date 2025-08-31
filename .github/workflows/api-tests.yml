@@ -1,0 +1,56 @@
+name: API Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Ensure reports directory exists
+      run: mkdir -p reports
+      
+    - name: Run User Management Tests
+      run: npm run test:user-management
+      continue-on-error: true
+      
+    - name: Run Authentication Tests
+      run: npm run test:authentication
+      continue-on-error: true
+      
+    - name: Upload HTML Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: html-test-reports
+        path: reports/*.html
+        
+    - name: Upload XML Results for GitHub
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: xml-test-results
+        path: reports/*.xml
+        
+    - name: Publish Test Results to GitHub
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: API Test Results
+        path: 'reports/*.xml'
+        reporter: java-junit
