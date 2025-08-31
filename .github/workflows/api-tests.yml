@@ -1,9 +1,11 @@
-name: API Tests
+name: API Tests - Debug Version
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
 
 jobs:
   test:
@@ -13,11 +15,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Debug - List all files
+      run: |
+        echo "=== Repository Structure ==="
+        find . -type f -name "*.json" | head -20
+        echo "=== Collections folder ==="
+        ls -la collections/ || echo "Collections folder not found"
+        echo "=== Configs folder ==="
+        ls -la configs/ || echo "Configs folder not found"
+        echo "=== Reports folder ==="
+        ls -la reports/ || echo "Reports folder not found"
+      
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
+        # Removed cache temporarily for debugging
         
     - name: Install dependencies
       run: npm install
@@ -25,32 +38,32 @@ jobs:
     - name: Ensure reports directory exists
       run: mkdir -p reports
       
-    - name: Run User Management Tests
-      run: npm run test:user-management
-      continue-on-error: true
+    - name: Test Newman Installation
+      run: |
+        npx newman --version
+        echo "Newman installed successfully"
       
-    - name: Run Authentication Tests
-      run: npm run test:authentication
+    - name: Test Simple Newman Run First
+      run: |
+        echo "=== Testing basic Newman functionality ==="
+        npm run test:simple
+        
+    - name: Run User Management Tests (with detailed output)
+      run: |
+        echo "=== Starting User Management Tests ==="
+        npm run test:user-management
       continue-on-error: true
-      
-    - name: Upload HTML Reports
+        
+    - name: Run Authentication Tests (with detailed output)  
+      run: |
+        echo "=== Starting Authentication Tests ==="
+        npm run test:authentication
+      continue-on-error: true
+        
+    - name: Upload All Reports (if any exist)
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: html-test-reports
-        path: reports/*.html
-        
-    - name: Upload XML Results for GitHub
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: xml-test-results
-        path: reports/*.xml
-        
-    - name: Publish Test Results to GitHub
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: API Test Results
-        path: 'reports/*.xml'
-        reporter: java-junit
+        name: all-generated-files
+        path: reports/
+        if-no-files-found: warn  # Don't fail if no files found
