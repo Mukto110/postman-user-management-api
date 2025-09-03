@@ -1,69 +1,84 @@
-name: API Tests - Debug Version
+name: API Tests - Full Suite (Node.js 22 LTS)
 
 on:
   push:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch: 
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Debug - List all files
+
+    - name: Debug - List key folders
       run: |
-        echo "=== Repository Structure ==="
-        find . -type f -name "*.json" | head -20
-        echo "=== Collections folder ==="
-        ls -la collections/ || echo "Collections folder not found"
-        echo "=== Configs folder ==="
-        ls -la configs/ || echo "Configs folder not found"
-        echo "=== Reports folder ==="
-        ls -la reports/ || echo "Reports folder not found"
-      
-    - name: Setup Node.js
+        echo "=== File Structure ==="
+        find . -type f -maxdepth 3
+        echo "=== collections/ ==="
+        ls -R collections/ || echo "Missing collections/"
+        echo "=== configs/ ==="
+        ls -R configs/ || echo "Missing configs/"
+        echo "=== data_sets/ ==="
+        ls -R data_sets/ || echo "Missing data_sets/"
+        echo "=== reports/ ==="
+        ls -R reports/ || echo "Missing reports/"
+
+    - name: Setup Node.js (latest LTS)
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
-        # Removed cache temporarily for debugging
-        
-    - name: Install dependencies
-      run: npm install
-      
+        node-version: '22' 
+
+    - name: Install dependencies globally
+      run: npm install -g newman newman-reporter-htmlextra
+
     - name: Ensure reports directory exists
       run: mkdir -p reports
-      
+
     - name: Test Newman Installation
       run: |
-        npx newman --version
-        echo "Newman installed successfully"
-      
-    - name: Test Simple Newman Run First
+        newman --version
+        echo "Newman is ready"
+
+    - name: Run User Management Tests
       run: |
-        echo "=== Testing basic Newman functionality ==="
-        npm run test:simple
-        
-    - name: Run User Management Tests (with detailed output)
-      run: |
-        echo "=== Starting User Management Tests ==="
-        npm run test:user-management
+        newman run collections/01_User_Management.postman_collection.json \
+          -e configs/qa_env.postman_environment.json \
+          -r htmlextra \
+          --reporter-htmlextra-export reports/User_Management_Test_Report.html \
+          --reporter-htmlextra-browserTitle "User Management Test Report" \
+          --reporter-htmlextra-title "User Management API Test Summary"
       continue-on-error: true
-        
-    - name: Run Authentication Tests (with detailed output)  
+
+    - name: Run Authentication Tests
       run: |
-        echo "=== Starting Authentication Tests ==="
-        npm run test:authentication
+        newman run collections/02_Authentication.postman_collection.json \
+          -e configs/qa_env.postman_environment.json \
+          -r htmlextra \
+          --reporter-htmlextra-export reports/Authentication_Test_Report.html \
+          --reporter-htmlextra-browserTitle "Authentication Test Report" \
+          --reporter-htmlextra-title "Authentication API Test Summary"
       continue-on-error: true
-        
-    - name: Upload All Reports (if any exist)
+
+    - name: Run Data-Driven Tests
+      run: |
+        newman run collections/03_Data_Driven.postman_collection.json \
+          -e configs/qa_env.postman_environment.json \
+          -d data_sets/product_data.json \
+          -r htmlextra \
+          --reporter-htmlextra-export reports/Data_Driven_Test_Report.html \
+          --reporter-htmlextra-browserTitle "Data Driven Test Report" \
+          --reporter-htmlextra-title "Data Driven API Test Summary"
+      continue-on-error: true
+
+    - name: Upload Test Reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: all-generated-files
+        name: API-Test-Reports
         path: reports/
-        if-no-files-found: warn  # Don't fail if no files found
+        if-no-files-found: warn
