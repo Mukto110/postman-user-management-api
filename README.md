@@ -1,6 +1,6 @@
 API Testing Project with CI/CD
 
-This is a demo API testing project built with Postman + Newman where I’ve automated multiple API workflows using both reqres.in and fakestoreapi.com.
+This is a demo API testing project built with Postman + Newman, where I’ve automated multiple API workflows using both reqres.in and fakestoreapi.com.
 
 The project covers:
 * API chaining
@@ -39,27 +39,22 @@ Make sure you have Node.js (LTS) and Newman installed.
 Here are the commands I use:
 
 🟢 User Management Tests
-<details> <summary>Click to copy command</summary>
 newman run collections/01_User_Management.postman_collection.json \
   -e configs/qa_env.postman_environment.json \
   -r htmlextra \
   --reporter-htmlextra-export reports/User_Management_Test_Report.html \
   --reporter-htmlextra-browserTitle "User Management Test Report" \
   --reporter-htmlextra-title "User Management API Test Summary"
-  </details>
 
 🟢 Authentication Tests
-<details> <summary>Click to copy command</summary>
 newman run collections/02_Authentication.postman_collection.json \
   -e configs/qa_env.postman_environment.json \
   -r htmlextra \
   --reporter-htmlextra-export reports/Authentication_Test_Report.html \
   --reporter-htmlextra-browserTitle "Authentication Test Report" \
   --reporter-htmlextra-title "Authentication API Test Summary"
-  </details>
 
 🟢 Data-Driven Tests
-<details> <summary>Click to copy command</summary>
   newman run collections/03_Data_Driven.postman_collection.json \
   -e configs/qa_env.postman_environment.json \
   -d data_sets/product_data.json \
@@ -67,7 +62,6 @@ newman run collections/02_Authentication.postman_collection.json \
   --reporter-htmlextra-export reports/Data_Driven_Test_Report.html \
   --reporter-htmlextra-browserTitle "Data Driven Test Report" \
   --reporter-htmlextra-title "Data Driven API Test Summary"
-  </details>
 
 
 
@@ -92,10 +86,6 @@ Edge Cases: Negative and boundary testing
 📜 Reports
 All tests generate HTML reports
 Easy to read with summary + detailed view
-
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Mukto110/postman-user-management-api/api-tests.yml?branch=main)
-![Newman Tests](https://img.shields.io/badge/Newman-Tests-blue)
-![Reports](https://img.shields.io/badge/Reports-HTML-success)
 
 🚩 Next Plans
 Add API mocking for custom scenarios
