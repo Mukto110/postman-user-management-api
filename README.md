@@ -46,6 +46,7 @@ newman run collections/01_User_Management.postman_collection.json \
   --reporter-htmlextra-export reports/User_Management_Test_Report.html \
   --reporter-htmlextra-browserTitle "User Management Test Report" \
   --reporter-htmlextra-title "User Management API Test Summary"
+  </details>
 
 🟢 Authentication Tests
 <details> <summary>Click to copy command</summary>
@@ -55,6 +56,7 @@ newman run collections/02_Authentication.postman_collection.json \
   --reporter-htmlextra-export reports/Authentication_Test_Report.html \
   --reporter-htmlextra-browserTitle "Authentication Test Report" \
   --reporter-htmlextra-title "Authentication API Test Summary"
+  </details>
 
 🟢 Data-Driven Tests
 <details> <summary>Click to copy command</summary>
@@ -65,6 +67,7 @@ newman run collections/02_Authentication.postman_collection.json \
   --reporter-htmlextra-export reports/Data_Driven_Test_Report.html \
   --reporter-htmlextra-browserTitle "Data Driven Test Report" \
   --reporter-htmlextra-title "Data Driven API Test Summary"
+  </details>
 
 
 
