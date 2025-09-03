@@ -1,4 +1,4 @@
-name: API Tests - Full Suite (Node.js 22 LTS)
+name: API Tests - Full Suite
 
 on:
   push:
@@ -45,34 +45,18 @@ jobs:
         echo "Newman is ready"
 
     - name: Run User Management Tests
-      run: |
-        newman run collections/01_User_Management.postman_collection.json \
-          -e configs/qa_env.postman_environment.json \
-          -r htmlextra \
-          --reporter-htmlextra-export reports/User_Management_Test_Report.html \
-          --reporter-htmlextra-browserTitle "User Management Test Report" \
-          --reporter-htmlextra-title "User Management API Test Summary"
+      if: matrix.test-suite == 'user' || github.event.inputs.test_suite == 'all'
+      run: npm run test:user
       continue-on-error: true
 
     - name: Run Authentication Tests
-      run: |
-        newman run collections/02_Authentication.postman_collection.json \
-          -e configs/qa_env.postman_environment.json \
-          -r htmlextra \
-          --reporter-htmlextra-export reports/Authentication_Test_Report.html \
-          --reporter-htmlextra-browserTitle "Authentication Test Report" \
-          --reporter-htmlextra-title "Authentication API Test Summary"
+      if: matrix.test-suite == 'auth' || github.event.inputs.test_suite == 'all'
+      run: npm run test:auth
       continue-on-error: true
 
     - name: Run Data-Driven Tests
-      run: |
-        newman run collections/03_Data_Driven.postman_collection.json \
-          -e configs/qa_env.postman_environment.json \
-          -d data_sets/product_data.json \
-          -r htmlextra \
-          --reporter-htmlextra-export reports/Data_Driven_Test_Report.html \
-          --reporter-htmlextra-browserTitle "Data Driven Test Report" \
-          --reporter-htmlextra-title "Data Driven API Test Summary"
+      if: matrix.test-suite == 'data' || github.event.inputs.test_suite == 'all'
+      run: npm run test:data
       continue-on-error: true
 
     - name: Upload Test Reports
