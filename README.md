@@ -1,53 +1,101 @@
-# API Testing Project with CI/CD
+API Testing Project with CI/CD
 
-This demo project shows automated API testing for a user management system (reqres.in) using Postman and Newman with a CI/CD pipeline.
+This is a demo API testing project built with Postman + Newman where I’ve automated multiple API workflows using both reqres.in and fakestoreapi.com.
 
-## What I've Done
+The project covers:
+* API chaining
+* Authentication using tokens
+* Data-driven testing
+* CI/CD with GitHub Actions + Jenkins
+* Automated HTML reports
 
-### API Testing
-* Implemented full CRUD operations with API chaining
-* Done authentication system (login and register) with token handling
-* Handled positive, negative, and edge cases for all endpoints
-* Used environment and global variables for better test management
+🔹 What I’ve Done ->
+1. User Management (reqres.in)
+Full CRUD APIs
+API chaining: One API’s output becomes the next API’s input
+Both positive & negative test cases
 
-### CI/CD Implementation
-* Set up GitHub Actions pipeline for automated testing
-* Configured Newman to run Postman collections automatically
-* Generated HTML reports for easy test result viewing
-* Created Jenkins job locally for additional automation
+2. Authentication (reqres.in)
+Login & Register APIs
+Token handling for secure calls
 
-## Project Structure
+3. Data-Driven Testing (fakestoreapi.com)
+Used product_data.json for multiple data sets
+Perfect for testing with multiple inputs at once
 
-```
-├── collections/          # Postman collection files
-├── configs/             # Environment and global variables
-├── reports/             # Generated HTML test reports
-├── .github/workflows/   # CI/CD pipeline configuration
-└── package.json         # Newman dependencies
-```
 
-## How It Works
+📂 Project Structure
+├── collections/          # Postman collections (User Mgmt, Auth, Data-Driven)
+├── configs/              # Environment files for different setups
+├── data_sets/            # JSON/CSV files for data-driven tests
+├── reports/              # Auto-generated HTML reports
+├── .github/workflows/    # GitHub Actions pipeline config
+└── package.json          # Dependencies for Newman
 
-1. **Push code** to GitHub
-2. **Pipeline triggers** automatically
-3. **Newman runs** all API tests
-4. **HTML reports** generated and stored
-5. **Results available** in GitHub Actions
 
-## Technologies Used
+⚡ Run Tests with Newman
+Make sure you have Node.js (LTS) and Newman installed.
 
-* **Postman** - API testing and collection management
-* **Newman** - Command line Postman runner
-* **GitHub Actions** - CI/CD automation
-* **Jenkins** - Local automation setup
-* **reqres.in** - Test API endpoints
+Here are the commands I use:
 
-## Test Coverage
+🟢 User Management Tests
+<details> <summary>Click to copy command</summary>
+newman run collections/01_User_Management.postman_collection.json \
+  -e configs/qa_env.postman_environment.json \
+  -r htmlextra \
+  --reporter-htmlextra-export reports/User_Management_Test_Report.html \
+  --reporter-htmlextra-browserTitle "User Management Test Report" \
+  --reporter-htmlextra-title "User Management API Test Summary"
 
-* **User Management**: Complete CRUD with API chaining
-* **Authentication**: Login/register with token validation
-* **Edge Cases**: Comprehensive negative and boundary testing
+🟢 Authentication Tests
+<details> <summary>Click to copy command</summary>
+newman run collections/02_Authentication.postman_collection.json \
+  -e configs/qa_env.postman_environment.json \
+  -r htmlextra \
+  --reporter-htmlextra-export reports/Authentication_Test_Report.html \
+  --reporter-htmlextra-browserTitle "Authentication Test Report" \
+  --reporter-htmlextra-title "Authentication API Test Summary"
 
----
+🟢 Data-Driven Tests
+<details> <summary>Click to copy command</summary>
+  newman run collections/03_Data_Driven.postman_collection.json \
+  -e configs/qa_env.postman_environment.json \
+  -d data_sets/product_data.json \
+  -r htmlextra \
+  --reporter-htmlextra-export reports/Data_Driven_Test_Report.html \
+  --reporter-htmlextra-browserTitle "Data Driven Test Report" \
+  --reporter-htmlextra-title "Data Driven API Test Summary"
 
-*This project demonstrates automated API testing practices with modern CI/CD workflows.*
+
+
+  ⚙️ CI/CD Integration
+  
+GitHub Actions
+Runs all tests automatically on push or pull request
+Generates HTML reports as artifacts
+Uses the latest Node.js LTS for reliability
+
+Jenkins (Local)
+Added for local CI/CD learning
+Same tests, triggered manually
+
+
+📊 Test Coverage
+User Management: CRUD + chaining
+Authentication: Login, Register, Token handling
+Data-Driven: Multiple product data sets with fakestoreapi.com
+Edge Cases: Negative and boundary testing
+
+📜 Reports
+All tests generate HTML reports
+Easy to read with summary + detailed view
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Mukto110/postman-user-management-api/api-tests.yml?branch=main)
+![Newman Tests](https://img.shields.io/badge/Newman-Tests-blue)
+![Reports](https://img.shields.io/badge/Reports-HTML-success)
+
+🚩 Next Plans
+Add API mocking for custom scenarios
+Run tests in parallel for faster feedback
+
+This project is a simple but complete demo of how to do real-world API testing with automation + CI/CD pipelines.
