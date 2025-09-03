@@ -1,0 +1,1574 @@
+{
+	"info": {
+		"_postman_id": "6b00dd23-0638-411f-99fc-9bc780d2e4b0",
+		"name": "03_Data_Driven",
+		"description": "In this collection all the APIs of fakestoreapi related to Products has been covered.\n\n# **APIs tested:**\n\n- GET - 7 API\n- POST - 1 API\n- PUT - 1 API\n- PATCH - 1 API\n- DELETE - 1 API\n    \n\n# **Features covered:**\n\n- Data driven testing\n- JSON Schema Validations\n- Expected response data validations\n- Sorting of data\n- Limiting the returned data\n    \n\n# Variables used:\n\n- Collection variable\n- Global variables\n- Built-in variables",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27409369"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "get single product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const expected_schema = {\r",
+									"    \"type\": \"object\",\r",
+									"    \"properties\": {\r",
+									"        \"id\": {\r",
+									"            \"type\": \"integer\"\r",
+									"        },\r",
+									"        \"title\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"price\": {\r",
+									"            \"type\": \"number\"\r",
+									"        },\r",
+									"        \"description\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"category\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"image\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"rating\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"properties\": {\r",
+									"                \"rate\": {\r",
+									"                    \"type\": \"number\"\r",
+									"                },\r",
+									"                \"count\": {\r",
+									"                    \"type\": \"integer\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"rate\",\r",
+									"                \"count\"\r",
+									"            ]\r",
+									"        }\r",
+									"    },\r",
+									"    \"required\": [\r",
+									"        \"id\",\r",
+									"        \"title\",\r",
+									"        \"price\",\r",
+									"        \"description\",\r",
+									"        \"category\",\r",
+									"        \"image\",\r",
+									"        \"rating\"\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an object and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('object').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected JSON schema validation\", () => {\r",
+									"    pm.response.to.have.jsonSchema(expected_schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected product ID validation\", () => {\r",
+									"    const expectedId = pm.collectionVariables.get(\"id\");\r",
+									"    \r",
+									"    pm.expect(expectedId, \"Collection variable 'id' should be set\").to.not.be.null;\r",
+									"    pm.expect(expectedId, \"Collection variable 'id' should not be undefined\").to.not.be.undefined;\r",
+									"    \r",
+									"    const expectedIdInt = parseInt(expectedId);\r",
+									"    pm.expect(expectedIdInt, \"Expected ID should be a valid number\").to.not.be.NaN;\r",
+									"    pm.expect(json_response.id).to.eql(expectedIdInt);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Price is positive\", () => {\r",
+									"    pm.expect(json_response.price).to.be.above(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Rating is valid\", () => {\r",
+									"    pm.expect(json_response.rating.rate).to.be.within(0, 5);\r",
+									"    pm.expect(json_response.rating.count).to.be.at.least(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response size under 1KB\", () => {\r",
+									"    pm.expect(pm.response.responseSize).to.be.below(1024);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Required string fields are not empty\", () => {\r",
+									"    pm.expect(json_response.title).to.be.a('string').and.not.be.empty;\r",
+									"    pm.expect(json_response.description).to.be.a('string').and.not.be.empty;\r",
+									"    pm.expect(json_response.category).to.be.a('string').and.not.be.empty;\r",
+									"    pm.expect(json_response.image).to.be.a('string').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Image URL format is valid\", () => {\r",
+									"    pm.expect(json_response.image).to.match(/^https?:\\/\\/.+/);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/{{id}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"{{id}}"
+							]
+						},
+						"description": "In this GET request we are getting single product returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Returned response should be a single object and not empty\n- Expected product only returned comparing with provided product id"
+					},
+					"response": []
+				},
+				{
+					"name": "get all products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const singleItem_schema = {\r",
+									"    \"type\": \"object\",\r",
+									"    \"properties\": {\r",
+									"        \"id\": {\r",
+									"            \"type\": \"integer\"\r",
+									"        },\r",
+									"        \"title\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"price\": {\r",
+									"            \"type\": \"number\" \r",
+									"        },\r",
+									"        \"description\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"category\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"image\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"rating\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"properties\": {\r",
+									"                \"rate\": {\r",
+									"                    \"type\": \"number\"\r",
+									"                },\r",
+									"                \"count\": {\r",
+									"                    \"type\": \"integer\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"rate\",\r",
+									"                \"count\"\r",
+									"            ]\r",
+									"        }\r",
+									"    },\r",
+									"    \"required\": [\r",
+									"        \"id\",\r",
+									"        \"title\",\r",
+									"        \"price\",\r",
+									"        \"description\",\r",
+									"        \"category\",\r",
+									"        \"image\",\r",
+									"        \"rating\"\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"const arraySchema = {\r",
+									"    \"type\": \"array\",\r",
+									"    \"items\": singleItem_schema,\r",
+									"    \"minItems\": 1\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is JSON\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Length of the returned products is 20\", () => {\r",
+									"    pm.expect(json_response.length).to.be.eql(20);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Each item matches expected JSON schema\", () => {\r",
+									"    json_response.forEach(function(item, index) {\r",
+									"        pm.expect(item, `Item at index ${index}`).to.be.jsonSchema(singleItem_schema);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Entire response matches array schema\", () => {\r",
+									"    pm.expect(json_response).to.be.jsonSchema(arraySchema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response size is within limit\", () => {\r",
+									"    pm.expect(pm.response.responseSize).to.be.below(12000);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All IDs are unique\", () => {\r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    const uniqueIds = [...new Set(ids)];\r",
+									"    pm.expect(uniqueIds.length).to.eql(ids.length);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Valid price and rating for each product\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.price, `Price for item ${index}`).to.be.above(0);\r",
+									"        pm.expect(item.rating.rate, `Rating rate for item ${index}`).to.be.within(0, 5);\r",
+									"        pm.expect(item.rating.count, `Rating count for item ${index}`).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All required fields are present and not empty\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.title, `Title for item ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.description, `Description for item ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.category, `Category for item ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.image, `Image for item ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Image URLs are valid format\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.image, `Image URL for item ${index}`).to.match(/^https?:\\/\\/.+/);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							]
+						},
+						"description": "In this GET request we are getting all the products returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Length of the array as expected (as there are limited data)\n- Returned response should be an array and not empty"
+					},
+					"response": []
+				},
+				{
+					"name": "get limited products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const singleProduct_schema = {\r",
+									"    \"type\": \"object\",\r",
+									"    \"properties\": {\r",
+									"        \"id\": {\r",
+									"            \"type\": \"integer\"\r",
+									"        },\r",
+									"        \"title\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"price\": {\r",
+									"            \"type\": \"number\"\r",
+									"        },\r",
+									"        \"description\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"category\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"image\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"rating\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"properties\": {\r",
+									"                \"rate\": {\r",
+									"                    \"type\": \"number\"\r",
+									"                },\r",
+									"                \"count\": {\r",
+									"                    \"type\": \"integer\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"rate\",\r",
+									"                \"count\"\r",
+									"            ]\r",
+									"        }\r",
+									"    },\r",
+									"    \"required\": [\r",
+									"        \"id\",\r",
+									"        \"title\",\r",
+									"        \"price\",\r",
+									"        \"description\",\r",
+									"        \"category\",\r",
+									"        \"image\",\r",
+									"        \"rating\"\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"const productsArray_schema = {\r",
+									"    \"type\": \"array\",\r",
+									"    \"items\": singleProduct_schema,\r",
+									"    \"minItems\": 1\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time is under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products limit validation\", () => {\r",
+									"    const expectedLimit = pm.collectionVariables.get(\"limit\");\r",
+									"    \r",
+									"    pm.expect(expectedLimit, \"Collection variable 'limit' should be set\").to.not.be.null;\r",
+									"    pm.expect(expectedLimit, \"Collection variable 'limit' should not be undefined\").to.not.be.undefined;\r",
+									"    \r",
+									"    const limitInt = parseInt(expectedLimit);\r",
+									"    pm.expect(limitInt, \"Expected limit should be a valid number\").to.not.be.NaN;\r",
+									"    pm.expect(json_response.length).to.eql(limitInt);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"JSON schema validation for each product\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item, `Product at index ${index}`).to.be.jsonSchema(singleProduct_schema);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Entire response matches products array schema\", () => {\r",
+									"    pm.expect(json_response).to.be.jsonSchema(productsArray_schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Required fields and valid values\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        [\"id\", \"title\", \"price\", \"description\", \"category\", \"image\", \"rating\"].forEach(field => {\r",
+									"            pm.expect(item[field], `${field} for product ${index}`).to.not.be.undefined;\r",
+									"        });\r",
+									"        \r",
+									"        pm.expect(item.price, `Price for product ${index}`).to.be.above(0);\r",
+									"        pm.expect(item.rating.rate, `Rating rate for product ${index}`).to.be.within(0, 5);\r",
+									"        pm.expect(item.rating.count, `Rating count for product ${index}`).to.be.at.least(0);\r",
+									"        \r",
+									"        pm.expect(item.title, `Title for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.description, `Description for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.category, `Category for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.image, `Image for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"IDs are unique\", () => {\r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    const uniqueIds = [...new Set(ids)];\r",
+									"    pm.expect(uniqueIds.length).to.eql(ids.length);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products sorted by ID ascending\", () => {\r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    const sortedIds = [...ids].sort((a, b) => a - b);\r",
+									"    pm.expect(ids).to.eql(sortedIds);\r",
+									"});\r",
+									"\r",
+									"console.log(\"Collection variable 'limit':\", pm.collectionVariables.get(\"limit\"));\r",
+									"console.log(\"Actual response length:\", json_response.length);\r",
+									"console.log(\"Response IDs:\", json_response.map(p => p.id));"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products?limit={{limit}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "{{limit}}"
+								}
+							]
+						},
+						"description": "In this GET request we are getting array of products returned so we are validating :\n\n- successful response\n    \n- JSON schema validation\n    \n- Returned response should be an array and not empty\n    \n- Expected number of products are returned according to given limit"
+					},
+					"response": []
+				},
+				{
+					"name": "get sorted products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const singleItem_schema = {\r",
+									"        \"type\": \"object\",\r",
+									"        \"properties\": {\r",
+									"            \"id\": {\r",
+									"                \"type\": \"integer\"\r",
+									"            },\r",
+									"            \"title\": {\r",
+									"                \"type\": \"string\"\r",
+									"            },\r",
+									"            \"price\": {\r",
+									"                \"type\": \"number\"\r",
+									"            },\r",
+									"            \"description\": {\r",
+									"                \"type\": \"string\"\r",
+									"            },\r",
+									"            \"category\": {\r",
+									"                \"type\": \"string\"\r",
+									"            },\r",
+									"            \"image\": {\r",
+									"                \"type\": \"string\"\r",
+									"            },\r",
+									"            \"rating\": {\r",
+									"                \"type\": \"object\",\r",
+									"                \"properties\": {\r",
+									"                    \"rate\": {\r",
+									"                        \"type\": \"number\"\r",
+									"                    },\r",
+									"                    \"count\": {\r",
+									"                        \"type\": \"integer\"\r",
+									"                    }\r",
+									"                },\r",
+									"                \"required\": [\r",
+									"                    \"rate\",\r",
+									"                    \"count\"\r",
+									"                ]\r",
+									"            }\r",
+									"        },\r",
+									"        \"required\": [\r",
+									"            \"id\",\r",
+									"            \"title\",\r",
+									"            \"price\",\r",
+									"            \"description\",\r",
+									"            \"category\",\r",
+									"            \"image\",\r",
+									"            \"rating\"\r",
+									"        ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data integrity check\", () => {\r",
+									"    json_response.forEach(item => {\r",
+									"        pm.expect(item.id).to.be.a('number');\r",
+									"        pm.expect(item.title).to.be.a('string').and.not.empty;\r",
+									"        pm.expect(item.price).to.be.above(0);\r",
+									"        pm.expect(item.rating.rate).to.be.within(0, 5);\r",
+									"        pm.expect(item.rating.count).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"validate returned items are in sorted order\", () => {\r",
+									"    sorting_order = pm.collectionVariables.get(\"sort\");\r",
+									"    if(sorting_order == 'asc'){\r",
+									"        pm.expect(json_response[0].id).to.be.eql(1);\r",
+									"    }else{\r",
+									"        pm.expect(json_response[0].id).to.be.eql(20);\r",
+									"    };\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate entire list is sorted\", () => {\r",
+									"    const sorting_order = pm.collectionVariables.get(\"sort\");\r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    const sortedIds = [...ids].sort((a, b) => sorting_order === 'asc' ? a - b : b - a);\r",
+									"    pm.expect(ids).to.eql(sortedIds);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.a('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Length of the returned products(20)\", () => {\r",
+									"    pm.expect(json_response.length).to.be.eql(20);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected JSON schema validation\", () => {\r",
+									"    json_response.forEach((item) => {\r",
+									"        pm.expect(item).to.be.jsonSchema(singleItem_schema);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products?sort={{sort}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "{{sort}}"
+								}
+							]
+						},
+						"description": "In this GET request we are getting array of products returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Returned response should be an array and not empty\n- Expected sorting order of products are returned according to given sort order asc or desc"
+					},
+					"response": []
+				},
+				{
+					"name": "get products with limit/sort",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const singleProduct_schema = {\r",
+									"    \"type\": \"object\",\r",
+									"    \"properties\": {\r",
+									"        \"id\": {\r",
+									"            \"type\": \"integer\"\r",
+									"        },\r",
+									"        \"title\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"price\": {\r",
+									"            \"type\": \"number\"\r",
+									"        },\r",
+									"        \"description\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"category\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"image\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"rating\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"properties\": {\r",
+									"                \"rate\": {\r",
+									"                    \"type\": \"number\"\r",
+									"                },\r",
+									"                \"count\": {\r",
+									"                    \"type\": \"integer\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"rate\",\r",
+									"                \"count\"\r",
+									"            ]\r",
+									"        }\r",
+									"    },\r",
+									"    \"required\": [\r",
+									"        \"id\",\r",
+									"        \"title\",\r",
+									"        \"price\",\r",
+									"        \"description\",\r",
+									"        \"category\",\r",
+									"        \"image\",\r",
+									"        \"rating\"\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Products limit validation\", () => {\r",
+									"    const expectedLimit = pm.collectionVariables.get(\"limit\");\r",
+									"    pm.expect(expectedLimit, \"Collection variable 'limit' should be set\").to.not.be.null;\r",
+									"    pm.expect(json_response.length).to.eql(parseInt(expectedLimit));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate returned items are in sorted order\", () => {\r",
+									"    const sorting_order = pm.collectionVariables.get(\"sort\");\r",
+									"    pm.expect(sorting_order, \"Collection variable 'sort' should be set\").to.not.be.null;\r",
+									"    \r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    if (sorting_order === 'asc') {\r",
+									"        pm.expect(json_response[0].id).to.eql(Math.min(...ids));\r",
+									"    } else {\r",
+									"        pm.expect(json_response[0].id).to.eql(Math.max(...ids));\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Validate entire list is sorted\", () => {\r",
+									"    const sorting_order = pm.collectionVariables.get(\"sort\");\r",
+									"    const ids = json_response.map(p => p.id);\r",
+									"    const sortedIds = [...ids].sort((a, b) => sorting_order === 'asc' ? a - b : b - a);\r",
+									"    pm.expect(ids).to.eql(sortedIds);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"JSON schema validation\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item, `Product at index ${index}`).to.be.jsonSchema(singleProduct_schema);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data integrity validation\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.id, `ID for product ${index}`).to.be.a('number');\r",
+									"        pm.expect(item.title, `Title for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.price, `Price for product ${index}`).to.be.above(0);\r",
+									"        pm.expect(item.rating.rate, `Rating rate for product ${index}`).to.be.within(0, 5);\r",
+									"        pm.expect(item.rating.count, `Rating count for product ${index}`).to.be.at.least(0);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products?limit={{limit}}&sort={{sort}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "{{limit}}"
+								},
+								{
+									"key": "sort",
+									"value": "{{sort}}"
+								}
+							]
+						},
+						"description": "In this GET request we are getting array of products returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Returned response should be an array and not empty\n- Expected sorting order of products are returned according to given sort order asc or desc\n    \n- Expected limit of products are returned according to given limit value"
+					},
+					"response": []
+				},
+				{
+					"name": "get all categories",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const expected_schema = {\r",
+									"    \"type\": \"array\",\r",
+									"    \"items\": {\r",
+									"        \"type\": \"string\"\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected schema validation\", () => {\r",
+									"    pm.response.to.have.jsonSchema(expected_schema);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Length of categories validation\", () => {\r",
+									"    pm.expect(json_response.length).to.eql(4);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Categories are unique and not empty\", () => {\r",
+									"    pm.expect(new Set(json_response).size).to.eql(json_response.length);\r",
+									"    json_response.forEach((category, index) => {\r",
+									"        pm.expect(category, `Category at index ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/categories",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"categories"
+							]
+						},
+						"description": "In this GET request we are getting all the products returned so we are validating :\n\n- successful response\n    \n- JSON schema validation\n    \n- Length of the array as expected (as there are limited data)\n    \n- Returned response should be an array and not empty"
+					},
+					"response": []
+				},
+				{
+					"name": "get specific category product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const singleItem_schema = {\r",
+									"    \"type\": \"object\",\r",
+									"    \"properties\": {\r",
+									"        \"id\": {\r",
+									"            \"type\": \"integer\"\r",
+									"        },\r",
+									"        \"title\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"price\": {\r",
+									"            \"type\": \"number\"\r",
+									"        },\r",
+									"        \"description\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"category\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"image\": {\r",
+									"            \"type\": \"string\"\r",
+									"        },\r",
+									"        \"rating\": {\r",
+									"            \"type\": \"object\",\r",
+									"            \"properties\": {\r",
+									"                \"rate\": {\r",
+									"                    \"type\": \"number\"\r",
+									"                },\r",
+									"                \"count\": {\r",
+									"                    \"type\": \"integer\"\r",
+									"                }\r",
+									"            },\r",
+									"            \"required\": [\r",
+									"                \"rate\",\r",
+									"                \"count\"\r",
+									"            ]\r",
+									"        }\r",
+									"    },\r",
+									"    \"required\": [\r",
+									"        \"id\",\r",
+									"        \"title\",\r",
+									"        \"price\",\r",
+									"        \"description\",\r",
+									"        \"category\",\r",
+									"        \"image\",\r",
+									"        \"rating\"\r",
+									"    ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is an array and not empty\", () => {\r",
+									"    pm.expect(json_response).to.be.an('array').and.not.be.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected schema validation\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item, `Product at index ${index}`).to.be.jsonSchema(singleItem_schema);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All products belong to the specified category\", () => {\r",
+									"    const expectedCategory = pm.collectionVariables.get(\"category\");\r",
+									"    pm.expect(expectedCategory, \"Collection variable 'category' should be set\").to.not.be.null;\r",
+									"    \r",
+									"    const categories = [...new Set(json_response.map(p => p.category))];\r",
+									"    pm.expect(categories.length).to.eql(1);\r",
+									"    pm.expect(categories[0]).to.eql(expectedCategory);\r",
+									"    \r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.category, `Category for product ${index}`).to.eql(expectedCategory);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data integrity validation\", () => {\r",
+									"    json_response.forEach((item, index) => {\r",
+									"        pm.expect(item.id, `ID for product ${index}`).to.be.a('number').and.above(0);\r",
+									"        pm.expect(item.title, `Title for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.price, `Price for product ${index}`).to.be.above(0);\r",
+									"        pm.expect(item.rating.rate, `Rating rate for product ${index}`).to.be.within(0, 5);\r",
+									"        pm.expect(item.rating.count, `Rating count for product ${index}`).to.be.at.least(0);\r",
+									"        pm.expect(item.description, `Description for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"        pm.expect(item.image, `Image for product ${index}`).to.be.a('string').and.not.be.empty;\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/category/{{category}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"category",
+								"{{category}}"
+							]
+						},
+						"description": "In this GET request we are getting single product returned so we are validating :\n\n- successful response\n    \n- JSON schema validation\n    \n- Returned response should be a single an array and not empty\n    \n- Expected category products only returned comparing with provided category"
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"",
+									"const expected_schema = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"id\": { \"type\": \"integer\" },",
+									"    \"title\": { \"type\": \"string\" },",
+									"    \"price\": { \"type\": [\"number\", \"string\"] },",
+									"    \"description\": { \"type\": \"string\" },",
+									"    \"category\": { \"type\": \"string\" },",
+									"    \"image\": { \"type\": \"string\" }",
+									"  },",
+									"  \"required\": [\"id\", \"title\", \"price\", \"description\", \"category\", \"image\"]",
+									"};",
+									"",
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Status code name has string\", () => {",
+									"    pm.response.to.have.status(\"Created\");",
+									"});",
+									"",
+									"pm.test(\"Content-Type is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+									"});",
+									"",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
+									"});",
+									"",
+									"pm.test(\"Response validation\", () => {",
+									"    pm.expect(json_response).to.have.property(\"id\");",
+									"    pm.expect(json_response.id).to.be.a('number');",
+									"});",
+									"",
+									"pm.test(\"Response is an object and not empty validation\", () => {",
+									"    pm.expect(json_response).to.be.a('object').and.is.not.empty;",
+									"});",
+									"",
+									"pm.test(\"Expected products validation\", () => {",
+									"    pm.expect(json_response.id).to.be.eql(21);",
+									"    if (pm.collectionVariables.get(\"title\")) {",
+									"        pm.expect(json_response.title).to.be.eql(pm.collectionVariables.get(\"title\"));",
+									"    }",
+									"    if (pm.collectionVariables.get(\"description\")) {",
+									"        pm.expect(json_response.description).to.be.eql(pm.collectionVariables.get(\"description\"));",
+									"    }",
+									"    if (pm.collectionVariables.get(\"price\")) {",
+									"        pm.expect(Number(json_response.price)).to.be.eql(Number(pm.collectionVariables.get(\"price\"))); ",
+									"    }",
+									"    if (pm.collectionVariables.get(\"image\")) {",
+									"        pm.expect(json_response.image).to.be.eql(pm.collectionVariables.get(\"image\"));",
+									"    }",
+									"    if (pm.collectionVariables.get(\"category\")) {",
+									"        pm.expect(json_response.category).to.be.eql(pm.collectionVariables.get(\"category\"));",
+									"    }",
+									"});",
+									"",
+									"pm.test(\"Product ID should be greater than 0\", () => {",
+									"    pm.expect(json_response.id).to.be.a('number').and.above(0);",
+									"});",
+									"",
+									"pm.test(\"Data integrity validation\", () => {",
+									"    pm.expect(json_response.title).to.be.a('string').and.not.empty;",
+									"    pm.expect(Number(json_response.price)).to.be.above(0);",
+									"    pm.expect(json_response.category).to.be.a('string').and.not.empty;",
+									"});",
+									"",
+									"pm.test(\"Response should not expose sensitive info\", () => {",
+									"    const responseString = JSON.stringify(json_response).toLowerCase();",
+									"    pm.expect(responseString).to.not.include(\"password\");",
+									"    pm.expect(responseString).to.not.include(\"token\");",
+									"});",
+									"",
+									"pm.test(\"Expected JSON schema validation\", () => {",
+									"    pm.response.to.have.jsonSchema(expected_schema);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"{{title}}\",\n    \"price\": \"{{price}}\",\n    \"description\": \"{{description}}\",\n    \"image\": \"{{image}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const expected_schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"id\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"title\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"price\": {\r",
+									"      \"type\": \"number\"\r",
+									"    },\r",
+									"    \"description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"category\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"image\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"id\",\r",
+									"    \"title\",\r",
+									"    \"price\",\r",
+									"    \"description\",\r",
+									"    \"category\",\r",
+									"    \"image\"\r",
+									"  ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response validation\", () => {\r",
+									"    pm.expect(json_response).to.have.property(\"id\");\r",
+									"    pm.expect(json_response.id).to.be.a('number')\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response is an object and not empty validation\", () => {\r",
+									"    pm.expect(json_response).to.be.a('object').and.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected products validation\", () => {\r",
+									"    pm.expect(json_response.id).to.be.eql(parseInt(pm.collectionVariables.get(\"id\")));\r",
+									"    pm.expect(json_response.title).to.be.eql(pm.collectionVariables.get(\"title\"));\r",
+									"    pm.expect(json_response.description).to.be.eql(pm.collectionVariables.get(\"description\"));\r",
+									"    pm.expect(json_response.price).to.be.eql(parseFloat(pm.collectionVariables.get(\"price\")));\r",
+									"    pm.expect(json_response.image).to.be.eql(pm.collectionVariables.get(\"image\"));\r",
+									"    pm.expect(json_response.category).to.be.eql(pm.collectionVariables.get(\"category\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data integrity validation\", () => {\r",
+									"    pm.expect(json_response.id).to.be.a('number').and.above(0);\r",
+									"    pm.expect(json_response.title).to.be.a('string').and.not.empty;\r",
+									"    pm.expect(json_response.price).to.be.above(0);\r",
+									"    pm.expect(json_response.category).to.be.a('string').and.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No sensitive information in response\", () => {\r",
+									"    const responseText = JSON.stringify(json_response).toLowerCase();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"    pm.expect(responseText).to.not.include(\"token\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected JSON schema validation\", () => {\r",
+									"    pm.response.to.have.jsonSchema(expected_schema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"{{title}}\",\r\n    \"price\": {{price}},\r\n    \"description\": \"{{description}}\",\r\n    \"image\": \"{{image}}\",\r\n    \"category\": \"{{category}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/{{id}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"{{id}}"
+							]
+						},
+						"description": "In this POST request we are adding the data and getting object of product returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Returned response should be an object and not empty\n- Expected product details are returned according to provided data"
+					},
+					"response": []
+				},
+				{
+					"name": "partial update product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const expected_schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"id\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"title\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"category\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"image\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"id\",\r",
+									"    \"title\",\r",
+									"    \"description\",\r",
+									"    \"category\",\r",
+									"    \"image\"\r",
+									"  ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"response validation\", () => {\r",
+									"    pm.expect(json_response).to.have.property(\"id\");\r",
+									"    pm.expect(json_response.id).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response is an object and not empty validation\", () => {\r",
+									"    pm.expect(json_response).to.be.a('object').and.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected products validation\", () => {\r",
+									"    pm.expect(json_response.id).to.be.eql(parseInt(pm.collectionVariables.get(\"id\")));\r",
+									"    pm.expect(json_response.title).to.be.eql(pm.collectionVariables.get(\"title\"));\r",
+									"    pm.expect(json_response.description).to.be.eql(pm.collectionVariables.get(\"description\"));\r",
+									"    pm.expect(json_response.image).to.be.eql(pm.collectionVariables.get(\"image\"));\r",
+									"    pm.expect(json_response.category).to.be.eql(pm.collectionVariables.get(\"category\"));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Only updated fields should change\", () => {\r",
+									"    const updatedTitle = pm.collectionVariables.get(\"title\");\r",
+									"    pm.expect(json_response.title).to.eql(updatedTitle);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data integrity validation\", () => {\r",
+									"    pm.expect(json_response.id).to.be.a('number').and.above(0);\r",
+									"    pm.expect(json_response.title).to.be.a('string').and.not.empty;\r",
+									"    pm.expect(json_response.category).to.be.a('string').and.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No sensitive info in response\", () => {\r",
+									"    const responseStr = JSON.stringify(json_response).toLowerCase();\r",
+									"    pm.expect(responseStr).to.not.include(\"password\");\r",
+									"    pm.expect(responseStr).to.not.include(\"token\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected JSON schema validation\", () => {\r",
+									"    pm.response.to.have.jsonSchema(expected_schema);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"{{title}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"image\": \"{{image}}\",\r\n    \"category\": \"{{category}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/{{id}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"{{id}}"
+							]
+						},
+						"description": "In this POST request we are adding the data and getting object of product returned so we are validating :\n\n- successful response\n    \n- JSON schema validation\n    \n- Returned response should be an object and not empty\n    \n- Expected product details are returned according to provided data"
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json_response = pm.response.json();\r",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");\r",
+									"\r",
+									"const expected_schema = {\r",
+									"  \"type\": \"object\",\r",
+									"  \"properties\": {\r",
+									"    \"id\": {\r",
+									"      \"type\": \"integer\"\r",
+									"    },\r",
+									"    \"title\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"price\": {\r",
+									"      \"type\": \"number\"\r",
+									"    },\r",
+									"    \"description\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"category\": {\r",
+									"      \"type\": \"string\"\r",
+									"    },\r",
+									"    \"image\": {\r",
+									"      \"type\": \"string\"\r",
+									"    }\r",
+									"  },\r",
+									"  \"required\": [\r",
+									"    \"id\",\r",
+									"    \"title\",\r",
+									"    \"price\",\r",
+									"    \"description\",\r",
+									"    \"category\",\r",
+									"    \"image\"\r",
+									"  ]\r",
+									"};\r",
+									"\r",
+									"pm.test(\"Status code is 200 or 204\", () => {\r",
+									"    pm.expect([200, 204]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Content-Type is application/json\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+									"});\r",
+									"\r",
+									"pm.test(`Response time under ${expectedResponseTime}ms`, () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response validation\", () => {\r",
+									"    pm.expect(json_response).to.have.property(\"id\");\r",
+									"    pm.expect(json_response.id).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"response is an object and not empty validation\", () => {\r",
+									"    pm.expect(json_response).to.be.a('object').and.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected products validation\", () => {\r",
+									"    pm.expect(json_response.id).to.be.eql(parseInt(pm.collectionVariables.get(\"id\")));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No sensitive info in response\", () => {\r",
+									"    const responseStr = JSON.stringify(json_response).toLowerCase();\r",
+									"    pm.expect(responseStr).to.not.include(\"password\");\r",
+									"    pm.expect(responseStr).to.not.include(\"token\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Expected JSON schema validation\", () => {\r",
+									"    pm.response.to.have.jsonSchema(expected_schema);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{dataDrivenBaseUrl}}products/{{id}}",
+							"host": [
+								"{{dataDrivenBaseUrl}}products"
+							],
+							"path": [
+								"{{id}}"
+							]
+						},
+						"description": "In this DELETE request we are deleting cart and getting object of cart item returned so we are validating :\n\n- successful response\n- JSON schema validation\n- Returned response should be an object and not empty\n- Expected product details are returned according to deleted data"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Assigning the values from csv file to collection level variables",
+					"pm.collectionVariables.set(\"id\", pm.iterationData.get(\"id\"));",
+					"pm.collectionVariables.set(\"title\", pm.iterationData.get(\"title\"));",
+					"pm.collectionVariables.set(\"price\", pm.iterationData.get(\"price\"));",
+					"pm.collectionVariables.set(\"description\", pm.iterationData.get(\"description\"));",
+					"pm.collectionVariables.set(\"category\", pm.iterationData.get(\"category\"));",
+					"pm.collectionVariables.set(\"image\", pm.iterationData.get(\"image\"));",
+					"pm.collectionVariables.set(\"rate\", pm.iterationData.get(\"rate\"));",
+					"pm.collectionVariables.set(\"count\", pm.iterationData.get(\"count\"));",
+					"",
+					"const limit = pm.variables.replaceIn('{{$randomInt}}') % 20 + 1;",
+					"pm.collectionVariables.set(\"limit\", limit);",
+					"const order = ['desc', 'asc'];",
+					"pm.collectionVariables.set(\"sort\",  order[_.random(order.lenght)]);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "title",
+			"value": ""
+		},
+		{
+			"key": "price",
+			"value": ""
+		},
+		{
+			"key": "description",
+			"value": ""
+		},
+		{
+			"key": "category",
+			"value": ""
+		},
+		{
+			"key": "image",
+			"value": ""
+		},
+		{
+			"key": "rate",
+			"value": ""
+		},
+		{
+			"key": "count",
+			"value": ""
+		},
+		{
+			"key": "limit",
+			"value": "3"
+		},
+		{
+			"key": "sort",
+			"value": "asc"
+		}
+	]
+}

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "17bada78-b433-40d7-9d52-60287b36953b",
+		"_postman_id": "a8ef9dd4-f382-485a-b74f-11b5cccffddb",
 		"name": "01_User_Management",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "27409369"
@@ -13,15 +13,27 @@
 					"name": "1_Default_Pagination",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
-									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"const pageNumber = pm.collectionVariables.get(\"pageNumber\");",
+									"",
 									"",
 									"const firstUserId = jsonData.data[0].id;",
-									"pm.collectionVariables.set(\"valid_user_id\", firstUserId);",
+									"pm.collectionVariables.set(\"validUserId\", firstUserId);",
+									"",
 									"",
 									"const schema = {",
 									"    \"type\": \"object\",",
@@ -78,19 +90,20 @@
 									"    ]",
 									"}",
 									"",
+									"",
 									"pm.test(\"Status code is 200\", () => {",
 									"    pm.response.to.have.status(200);",
 									"})",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"OK\");",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, () => {",
 									"    const response = pm.response.json();",
 									"    pm.expect(response).to.have.property('page');",
 									"    pm.expect(response).to.have.property('per_page');",
@@ -116,7 +129,7 @@
 									"    pm.response.to.have.jsonSchema(schema);",
 									"})",
 									"",
-									"pm.test(\"Content-Type is present\", function () {",
+									"pm.test(\"Content-Type is present\", () => {",
 									"    pm.response.to.have.header(\"Content-Type\");",
 									"});",
 									"",
@@ -141,25 +154,27 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{base_url}}/api/users",
+							"raw": "{{userBaseUrl}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
@@ -173,12 +188,22 @@
 					"name": "2_Page_1",
 					"event": [
 						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"pageNumber\", 1);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
-									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"const pageNumber = pm.collectionVariables.get(\"pageNumber\");",
 									"",
 									"const schema = {",
 									"  \"type\": \"object\",",
@@ -392,15 +417,15 @@
 									"    pm.response.to.have.status(200);",
 									"})",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"OK\");",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, () => {",
 									"    const response = pm.response.json();",
 									"    pm.expect(response).to.have.property('page');",
 									"    pm.expect(response).to.have.property('per_page');",
@@ -410,7 +435,7 @@
 									"    pm.expect(response.data).to.be.an('array');",
 									"});",
 									"",
-									"pm.test(\"Page 1 parameter matches response\", function () {",
+									"pm.test(\"Page 1 parameter matches response\", () => {",
 									"    pm.expect(jsonData.page).to.equal(1);",
 									"});",
 									"",
@@ -426,7 +451,7 @@
 									"    pm.response.to.have.jsonSchema(schema);",
 									"})",
 									"",
-									"pm.test(\"Content-Type is present\", function () {",
+									"pm.test(\"Content-Type is present\", () => {",
 									"    pm.response.to.have.header(\"Content-Type\");",
 									"});",
 									"",
@@ -451,25 +476,22 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"pm.collectionVariables.set(\"page_number\", 1);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"url": {
-							"raw": "{{base_url}}/api/users?page={{page_number}}",
+							"raw": "{{userBaseUrl}}/api/users?page={{pageNumber}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
@@ -478,7 +500,7 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "{{page_number}}"
+									"value": "{{pageNumber}}"
 								}
 							]
 						}
@@ -492,7 +514,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set(\"page_number\", 2);"
+									"pm.collectionVariables.set(\"pageNumber\", 2);"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -503,8 +525,8 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
-									"const pageNumber = pm.collectionVariables.get(\"page_number\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"const pageNumber = pm.collectionVariables.get(\"pageNumber\");",
 									"",
 									"const schema = {",
 									"  \"type\": \"object\",",
@@ -718,15 +740,15 @@
 									"    pm.response.to.have.status(200);",
 									"})",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"OK\");",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(`Response structure valid (Page: ${pageNumber})`, function () {",
+									"pm.test(`Response structure valid (Page: ${pageNumber})`, () => {",
 									"    const response = pm.response.json();",
 									"    pm.expect(response).to.have.property('page');",
 									"    pm.expect(response).to.have.property('per_page');",
@@ -736,7 +758,7 @@
 									"    pm.expect(response.data).to.be.an('array');",
 									"});",
 									"",
-									"pm.test(\"Page 2 parameter matches response\", function () {",
+									"pm.test(\"Page 2 parameter matches response\", () => {",
 									"    pm.expect(jsonData.page).to.equal(2);",
 									"});",
 									"",
@@ -752,7 +774,7 @@
 									"    pm.response.to.have.jsonSchema(schema);",
 									"})",
 									"",
-									"pm.test(\"Content-Type is present\", function () {",
+									"pm.test(\"Content-Type is present\", () => {",
 									"    pm.response.to.have.header(\"Content-Type\");",
 									"});",
 									"",
@@ -783,9 +805,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/users?page={{page_number}}",
+							"raw": "{{userBaseUrl}}/api/users?page={{pageNumber}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
@@ -794,7 +816,7 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "{{page_number}}"
+									"value": "{{pageNumber}}"
 								}
 							]
 						}
@@ -809,14 +831,14 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
-									"const invalidPageNo = pm.collectionVariables.get(\"invalid_page_number\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"const invalidPageNo = pm.collectionVariables.get(\"invalidPageNumber\");",
 									"",
 									"pm.test(\"Status code is 200 or 400\", () => {",
 									"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
 									"})",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
@@ -858,9 +880,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/users?page={{invalid_page_number}}",
+							"raw": "{{userBaseUrl}}/api/users?page={{invalidPageNumber}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
@@ -869,7 +891,7 @@
 							"query": [
 								{
 									"key": "page",
-									"value": "{{invalid_page_number}}"
+									"value": "{{invalidPageNumber}}"
 								}
 							]
 						}
@@ -889,9 +911,9 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
 									"const userData = jsonData.data;",
-									"const expectedId = pm.collectionVariables.get(\"valid_user_id\");",
+									"const expectedId = pm.collectionVariables.get(\"validUserId\");",
 									"",
 									"const schema = {",
 									"  \"type\": \"object\",",
@@ -945,31 +967,31 @@
 									"  ]",
 									"}",
 									"",
-									"pm.test(\"Status code is 200\", function () {",
+									"pm.test(\"Status code is 200\", () => {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"OK\");",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(\"Response body is valid JSON\", function () {",
+									"pm.test(\"Response body is valid JSON\", () => {",
 									"    pm.response.to.be.json;",
 									"});",
 									"",
-									"pm.test(\"Response body matches schema\", function () {",
+									"pm.test(\"Response body matches schema\", () => {",
 									"    pm.expect(jsonData).to.be.jsonSchema(schema);",
 									"});",
 									"",
-									"pm.test(\"Data id matches expected id\", function () {",
+									"pm.test(\"Data id matches expected id\", () => {",
 									"    pm.expect(userData.id).to.equal(parseInt(expectedId));",
 									"});",
 									"",
-									"pm.test(\"Response contains user data and support info\", function () {",
+									"pm.test(\"Response contains user data and support info\", () => {",
 									"    pm.expect(jsonData).to.have.property('data');",
 									"    pm.expect(jsonData).to.have.property('support');",
 									"    ",
@@ -977,7 +999,7 @@
 									"    pm.expect(userData).to.have.property('email');",
 									"});",
 									"",
-									"pm.test(\"Content-Type is present\", function () {",
+									"pm.test(\"Content-Type is present\", () => {",
 									"    pm.response.to.have.header(\"Content-Type\");",
 									"});",
 									"",
@@ -1002,30 +1024,20 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
 						}
 					],
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/users/{{valid_user_id}}",
+							"raw": "{{userBaseUrl}}/api/users/{{validUserId}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
 								"users",
-								"{{valid_user_id}}"
+								"{{validUserId}}"
 							]
 						}
 					},
@@ -1038,23 +1050,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Non-existent user returns 404\", function () {",
+									"pm.test(\"Non-existent user returns 404\", () => {",
 									"    pm.expect(pm.response.code).to.equal(404);",
 									"});",
 									"",
-									"pm.test(\"404 response has empty body\", function () {",
+									"pm.test(\"404 response has empty body\", () => {",
 									"    pm.expect(pm.response.text()).to.equal('{}');",
 									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [],
-								"type": "text/javascript"
 							}
 						}
 					],
@@ -1062,9 +1067,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/users/999",
+							"raw": "{{userBaseUrl}}/api/users/999",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"api",
@@ -1082,7 +1087,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Invalid user ID format returns 404\", function () {",
+									"pm.test(\"Invalid user ID format returns 404\", () => {",
 									"    pm.expect(pm.response.code).to.equal(404);",
 									"});"
 								],
@@ -1095,9 +1100,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/abc",
+							"raw": "{{userBaseUrl}}/users/abc",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
 								"users",
@@ -1119,8 +1124,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.environment.set(\"random_name\", \"TestUser_\" + Math.floor(Math.random() * 10000));",
-									"pm.environment.set(\"random_job\", \"Tester_\" + Date.now());"
+									"pm.collectionVariables.set(\"randomName\", \"TestUser_\" + Math.floor(Math.random() * 10000));",
+									"pm.collectionVariables.set(\"randomJob\", \"Tester_\" + Date.now());"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1131,11 +1136,11 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
-									"const expectedName = pm.environment.get(\"random_name\");",
-									"const expectedJob = pm.environment.get(\"random_job\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
+									"const expectedName = pm.collectionVariables.get(\"randomName\");",
+									"const expectedJob = pm.collectionVariables.get(\"randomJob\");",
 									"",
-									"pm.environment.set(\"current_user_id\", jsonData.id);",
+									"pm.collectionVariables.set(\"currentUserId\", jsonData.id);",
 									"",
 									"const schema = {",
 									"  \"type\": \"object\",",
@@ -1161,19 +1166,19 @@
 									"  ]",
 									"}",
 									"",
-									"pm.test(\"Successful POST request\", function () {",
+									"pm.test(\"Successful POST request\", () => {",
 									"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
 									"});",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"Created\");",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(\"Response contains required fields\", function () {",
+									"pm.test(\"Response contains required fields\", () => {",
 									"    const response = pm.response.json();",
 									"    pm.expect(response).to.have.property('id');",
 									"    pm.expect(response).to.have.property('name');",
@@ -1181,16 +1186,16 @@
 									"    pm.expect(response).to.have.property('createdAt');",
 									"});",
 									"",
-									"pm.test(\"Name and Job match the request\", function () {",
+									"pm.test(\"Name and Job match the request\", () => {",
 									"    pm.expect(jsonData.name).to.equal(expectedName);",
 									"    pm.expect(jsonData.job).to.equal(expectedJob);",
 									"});",
 									"",
-									"pm.test(\"ID is numeric\", function () {",
+									"pm.test(\"ID is numeric\", () => {",
 									"    pm.expect(jsonData.id).to.match(/^\\d+$/);",
 									"});",
 									"",
-									"pm.test(\"CreatedAt timestamp is valid ISO format\", function () {",
+									"pm.test(\"CreatedAt timestamp is valid ISO format\", () => {",
 									"    const timestamp = new Date(jsonData.createdAt);",
 									"    pm.expect(timestamp).to.be.a('date');",
 									"    pm.expect(jsonData.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
@@ -1226,7 +1231,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{random_name}}\",\n    \"job\": \"{{random_job}}\"\n}",
+							"raw": "{\n    \"name\": \"{{randomName}}\",\n    \"job\": \"{{randomJob}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1234,12 +1239,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users",
+							"raw": "{{userBaseUrl}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users"
 							]
 						}
@@ -1254,30 +1259,30 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
 									"",
-									"pm.test(\"Successful POST request\", function () {",
+									"pm.test(\"Successful POST request\", () => {",
 									"    pm.expect(pm.response.code).to.be.oneOf([201, 202]);",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"Created\");",
 									"});",
 									"",
-									"pm.test(\"Empty body still creates user with default values\", function () {",
+									"pm.test(\"Empty body still creates user with default values\", () => {",
 									"    pm.expect(jsonData).to.have.property('id');",
 									"    pm.expect(jsonData).to.have.property('createdAt');",
 									"});",
 									"",
-									"pm.test(\"ID is numeric\", function () {",
+									"pm.test(\"ID is numeric\", () => {",
 									"    pm.expect(jsonData.id).to.match(/^\\d+$/);",
 									"});",
 									"",
-									"pm.test(\"CreatedAt timestamp is valid ISO format\", function () {",
+									"pm.test(\"CreatedAt timestamp is valid ISO format\", () => {",
 									"    const timestamp = new Date(jsonData.createdAt);",
 									"    pm.expect(timestamp).to.be.a('date');",
 									"    pm.expect(jsonData.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/);",
@@ -1289,6 +1294,58 @@
 									"",
 									"pm.test(\"Response body is not empty\", () => {",
 									"    pm.expect(pm.response.text()).to.not.be.empty;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{userBaseUrl}}/api/users",
+							"host": [
+								"{{userBaseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing_Fields_Negative",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Partial data handled appropriately\", () => {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"    pm.expect(jsonData.name).to.equal(\"TestOnly\");",
+									"    pm.expect(jsonData).to.not.have.property('job');",
 									"});"
 								],
 								"type": "text/javascript",
@@ -1311,46 +1368,6 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"{{api_version}}",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Missing_Fields_Negative",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const jsonData = pm.response.json();",
-									"",
-									"pm.test(\"Partial data handled appropriately\", function () {",
-									"    pm.expect(pm.response.code).to.equal(201);",
-									"    pm.expect(jsonData.name).to.equal(\"TestOnly\");",
-									"    pm.expect(jsonData).to.not.have.property('job');",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
 							"raw": "{\"name\": \"TestOnly\"}",
 							"options": {
 								"raw": {
@@ -1359,12 +1376,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users",
+							"raw": "{{userBaseUrl}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users"
 							]
 						}
@@ -1383,8 +1400,8 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"pm.globals.set(\"updated_name\", \"UpdatedUser_\" + Date.now());",
-									"pm.globals.set(\"updated_job\", \"UpdatedJob_\" + Date.now());"
+									"pm.collectionVariables.set(\"updatedName\", \"UpdatedUser_\" + Date.now());",
+									"pm.collectionVariables.set(\"updatedJob\", \"UpdatedJob_\" + Date.now());"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1395,27 +1412,27 @@
 							"script": {
 								"exec": [
 									"const jsonData = pm.response.json();",
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
 									"",
-									"const oldName = pm.environment.get(\"random_name\");",
-									"const oldJob = pm.environment.get(\"random_job\");",
-									"const currentName = pm.globals.get(\"updated_name\");",
-									"const currentJob = pm.globals.get(\"updated_job\");",
+									"const oldName = pm.collectionVariables.get(\"randomName\");",
+									"const oldJob = pm.collectionVariables.get(\"randomJob\");",
+									"const currentName = pm.collectionVariables.get(\"updatedName\");",
+									"const currentJob = pm.collectionVariables.get(\"updatedJob\");",
 									"",
-									"pm.test(\"User updated successfully\", function () {",
+									"pm.test(\"User updated successfully\", () => {",
 									"    pm.expect(pm.response.code).to.equal(200);",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(\"Name and job are updated correctly\", function () {",
+									"pm.test(\"Name and job are updated correctly\", () => {",
 									"    pm.expect(currentName).not.to.equal(oldName);",
 									"    pm.expect(currentJob).not.to.equal(oldJob);",
 									"});",
 									"",
-									"pm.test(\"UpdatedAt timestamp is recent\", function () {",
+									"pm.test(\"UpdatedAt timestamp is recent\", () => {",
 									"    const response = pm.response.json();",
 									"    const updatedTime = new Date(response.updatedAt);",
 									"    const now = new Date();",
@@ -1434,17 +1451,17 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{updated_name}}\",\n    \"job\": \"{{updated_job}}\"\n}"
+							"raw": "{\n    \"name\": \"{{updatedName}}\",\n    \"job\": \"{{updatedJob}}\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users/{{current_user_id}}",
+							"raw": "{{userBaseUrl}}/api/users/{{currentUserId}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users",
-								"{{current_user_id}}"
+								"{{currentUserId}}"
 							]
 						}
 					},
@@ -1457,9 +1474,19 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Update non-existent user still returns 200\", function () {",
+									"pm.test(\"Update non-existent user still returns 200\", () => {",
 									"    pm.expect(pm.response.code).to.equal(200);",
 									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -1479,12 +1506,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users/999",
+							"raw": "{{userBaseUrl}}/api/users/999",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users",
 								"999"
 							]
@@ -1504,25 +1531,25 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const expectedResponseTime = pm.collectionVariables.get(\"response_time\");",
+									"const expectedResponseTime = pm.environment.get(\"responseTime\");",
 									"",
-									"pm.test(\"User deleted successfully\", function () {",
+									"pm.test(\"User deleted successfully\", () => {",
 									"    pm.expect(pm.response.code).to.equal(204);",
 									"});",
 									"",
-									"pm.test(`Response time is less than ${expectedResponseTime}ms`, function () {",
+									"pm.test(`Response time is less than ${expectedResponseTime}ms`, () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(parseInt(expectedResponseTime));",
 									"});",
 									"",
-									"pm.test(\"Status code name has string\", function () {",
+									"pm.test(\"Status code name has string\", () => {",
 									"    pm.response.to.have.status(\"No Content\");",
 									"});",
 									"",
-									"pm.test(\"Delete returns no content\", function () {",
+									"pm.test(\"Delete returns no content\", () => {",
 									"    pm.expect(pm.response.text()).to.equal(\"\");",
 									"});",
 									"",
-									"pm.test(\"Response time is acceptable\", function () {",
+									"pm.test(\"Response time is acceptable\", () => {",
 									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
 									"});"
 								],
@@ -1549,21 +1576,21 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users/{{current_user_id}}",
+							"raw": "{{userBaseUrl}}/api/users/{{currentUserId}}",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users",
-								"{{current_user_id}}"
+								"{{currentUserId}}"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Non_Existent_User_Negative",
+					"name": "Non-Existant_User",
 					"event": [
 						{
 							"listen": "test",
@@ -1576,6 +1603,13 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -1583,15 +1617,15 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n    \"name\": \"Test\",\n    \"job\": \"Test\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/{{api_version}}/users/999",
+							"raw": "{{userBaseUrl}}/api/users/999",
 							"host": [
-								"{{base_url}}"
+								"{{userBaseUrl}}"
 							],
 							"path": [
-								"{{api_version}}",
+								"api",
 								"users",
 								"999"
 							]
@@ -1606,13 +1640,8 @@
 		"type": "apikey",
 		"apikey": [
 			{
-				"key": "in",
-				"value": "header",
-				"type": "string"
-			},
-			{
 				"key": "value",
-				"value": "{{API_Key}}",
+				"value": "{{apiKey}}",
 				"type": "string"
 			},
 			{
@@ -1646,20 +1675,40 @@
 	],
 	"variable": [
 		{
-			"key": "page_number",
+			"key": "validUserId",
 			"value": "1"
 		},
 		{
-			"key": "invalid_page_number",
-			"value": "999"
+			"key": "invalidPageNumber",
+			"value": "999",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
 		},
 		{
-			"key": "valid_user_id",
+			"key": "pageNumber",
+			"value": "1"
+		},
+		{
+			"key": "randomName",
 			"value": ""
 		},
 		{
-			"key": "response_time",
-			"value": "1000"
+			"key": "randomJob",
+			"value": ""
+		},
+		{
+			"key": "currentUserId",
+			"value": "1"
+		},
+		{
+			"key": "updatedName",
+			"value": ""
+		},
+		{
+			"key": "updatedJob",
+			"value": ""
 		}
 	]
 }
