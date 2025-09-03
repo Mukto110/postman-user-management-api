@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "Automated API testing with CI/CD",
   "scripts": {
-    "test:user-management": "newman run collections/01_User_Management.postman_collection.json -e configs/qa_postman_environment.json -g configs/workspace.postman_globals.json --reporters cli,htmlextra --reporter-htmlextra-export reports/user-management-report.html --reporter-htmlextra-title 'User Management API Tests' --bail",
-    "test:authentication": "newman run collections/02_Authentication.postman_collection.json -e configs/qa_postman_environment.json -g configs/workspace.postman_globals.json --reporters cli,htmlextra --reporter-htmlextra-export reports/authentication-report.html --reporter-htmlextra-title 'Authentication API Tests' --bail",
-    "test:all": "npm run test:user-management; npm run test:authentication",
-    "debug:files": "echo 'Collections:' && ls -la collections/ && echo 'Configs:' && ls -la configs/",
-    "test:simple": "newman run collections/01_User_Management.postman_collection.json -e configs/qa_postman_environment.json --reporters cli"
+    "test:user": "newman run collections/01_User_Management.postman_collection.json -e configs/qa_env.postman_environment.json -r htmlextra --reporter-htmlextra-export reports/User_Management_Test_Report.html --reporter-htmlextra-browserTitle 'User Management Test Report' --reporter-htmlextra-title 'User Management API Test Summary'",
+    "test:auth": "newman run collections/02_Authentication.postman_collection.json -e configs/qa_env.postman_environment.json -r htmlextra --reporter-htmlextra-export reports/Authentication_Test_Report.html --reporter-htmlextra-browserTitle 'Authentication Test Report' --reporter-htmlextra-title 'Authentication API Test Summary'",
+    "test:data": "newman run collections/03_Data_Driven.postman_collection.json -e configs/qa_env.postman_environment.json -d data_sets/product_data.json -r htmlextra --reporter-htmlextra-export reports/Data_Driven_Test_Report.html --reporter-htmlextra-browserTitle 'Data Driven Test Report' --reporter-htmlextra-title 'Data Driven API Test Summary'",
+    "test:all": "npm run test:user && npm run test:auth && npm run test:data",
   },
   "devDependencies": {
     "newman": "^6.2.1",
